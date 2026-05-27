@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#2d5a27"/>
+  <!-- Ground -->
+  <ellipse cx="256" cy="388" rx="110" ry="14" fill="#1a3a15"/>
+  <!-- Trunk -->
+  <rect x="236" y="250" width="40" height="140" rx="8" fill="#6B4423"/>
+  <!-- Roots -->
+  <path d="M236 388 Q210 396 185 392" fill="none" stroke="#6B4423" stroke-width="10" stroke-linecap="round"/>
+  <path d="M276 388 Q302 396 327 392" fill="none" stroke="#6B4423" stroke-width="10" stroke-linecap="round"/>
+  <!-- Leaf clusters -->
+  <circle cx="256" cy="210" r="75" fill="#4a8a42"/>
+  <circle cx="172" cy="248" r="52" fill="#3d7535"/>
+  <circle cx="340" cy="248" r="52" fill="#3d7535"/>
+  <circle cx="210" cy="275" r="40" fill="#2d5a27"/>
+  <circle cx="302" cy="275" r="40" fill="#2d5a27"/>
+  <circle cx="256" cy="262" r="44" fill="#5ba052"/>
+  <!-- Small highlight leaves -->
+  <circle cx="200" cy="180" r="28" fill="#4a8a42"/>
+  <circle cx="312" cy="180" r="28" fill="#4a8a42"/>
+</svg>

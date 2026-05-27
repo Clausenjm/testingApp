@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#2d5a27"/>
+<meta name="description" content="Track your clean time, watch your tree grow, and stay rooted."/>
+
+<!-- PWA / Install -->
+<link rel="manifest" href="manifest.json"/>
+
+<!-- Android Chrome -->
+<meta name="mobile-web-app-capable" content="yes"/>
+
+<!-- iOS Safari (fallback) -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Grounded"/>
+<link rel="apple-touch-icon" href="icons/icon-152.png"/>
+
+<title>Grounded – Quit Weed</title>
+<link rel="icon" href="icons/icon-192.png"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css"/>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:Georgia,serif;background:#f5f0e8;color:#2c1a0e;
+  max-width:430px;margin:0 auto;min-height:100%;
+  /* Safe area insets for notched phones */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+:root{
+  --bg:#f5f0e8;--card:#faf7f2;--green:#2d5a27;--gl:#4a8a42;--gp:#d8ead5;
+  --amb:#c17d3c;--ambp:#f5e8d5;--txt:#2c1a0e;--mut:#7a6a55;
+  --gold:#c9960c;--silver:#8a8a8a;--bronze:#a05c2a;--border:#e0d8cc;
+}
+input[type=range]{width:100%;accent-color:var(--green)}
+input[type=date],input[type=text]{
+  width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;font-size:16px;font-family:Georgia,serif;color:var(--txt)
+}
+button{font-family:Georgia,serif;cursor:pointer}
+.screen{display:none;padding:20px 20px 90px;animation:fadeIn 0.3s ease}
+.screen.active{display:block}
+.onboard{display:none;padding:30px 24px;min-height:100%;animation:fadeIn 0.3s ease}
+.onboard.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav button{flex:1;padding:10px 0;background:none;border:none;display:flex;flex-direction:column;
+  align-items:center;gap:3px;color:var(--mut);font-size:10px;font-family:Georgia,serif;transition:color 0.2s}
+.nav button.active{color:var(--green)}
+.nav button i{font-size:22px}
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px}
+.pill{display:inline-block;padding:3px 14px;border-radius:20px;font-size:12px}
+.pill-green{background:var(--gp);color:var(--green)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px}
+.stat-label{font-size:11px;color:var(--mut);margin-bottom:4px}
+.stat-val{font-family:Georgia,serif;line-height:1}
+.btn-primary{width:100%;padding:14px;border-radius:30px;border:none;background:var(--green);color:#fff;font-size:16px;font-family:Georgia,serif}
+.btn-ghost{width:100%;padding:12px;border-radius:30px;border:none;background:transparent;color:var(--mut);font-size:15px;font-family:Georgia,serif}
+.ach-card{border-radius:10px;border:1px solid var(--border);padding:12px;text-align:center;transition:all 0.2s;background:var(--card)}
+.ach-card.earned{background:var(--gp);border-color:#4a8a4250}
+.ach-card.streak-earned{background:var(--ambp);border-color:#c17d3c50}
+.timeline-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:14px;position:relative;z-index:1}
+.phase-card{border-radius:12px;border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;background:var(--card)}
+h2{color:var(--green);font-weight:normal;font-size:20px;margin-bottom:16px}
+h3{color:var(--txt);font-weight:normal;font-size:15px;margin:16px 0 10px}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="ob0" class="onboard active">
+  <div style="text-align:center;padding-top:30px">
+    <svg viewBox="0 0 300 240" width="100%" style="display:block">
+      <ellipse cx="150" cy="221" rx="70" ry="8" fill="#b8956a" opacity="0.35"/>
+      <rect x="144" y="145" width="12" height="75" rx="3" fill="#6B4423"/>
+      <path d="M144 218 Q128 222 114 220" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+      <path d="M156 218 Q172 222 186 220" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="150" cy="125" r="36" fill="#4a8a42"/>
+      <circle cx="118" cy="148" r="24" fill="#2d5a27"/>
+      <circle cx="182" cy="148" r="24" fill="#2d5a27"/>
+      <circle cx="134" cy="162" r="18" fill="#3d7535"/>
+      <circle cx="166" cy="162" r="18" fill="#3d7535"/>
+      <circle cx="150" cy="152" r="20" fill="#5ba052"/>
+    </svg>
+    <h1 style="color:var(--green);font-size:30px;margin:8px 0;font-weight:normal;letter-spacing:1px">Grounded</h1>
+    <p style="color:var(--mut);font-size:15px;line-height:1.7;margin:0 10px 40px">Your free companion for quitting weed.<br>Watch your tree grow as you heal.</p>
+    <button class="btn-primary" onclick="showOB(1)">Start My Journey</button>
+  </div>
+</div>
+
+<div id="ob1" class="onboard">
+  <div style="padding-top:50px">
+    <div style="color:var(--mut);font-size:11px;letter-spacing:2px;margin-bottom:8px">STEP 1 OF 4</div>
+    <h2 style="font-size:22px;margin-bottom:6px">What's your name?</h2>
+    <p style="color:var(--mut);font-size:14px;margin-bottom:24px">We'll use it to make this yours.</p>
+    <input type="text" id="inp-name" placeholder="Your name..." oninput="checkOB1()"/>
+    <div style="margin-top:16px">
+      <button class="btn-primary" id="btn-ob1" onclick="showOB(2)" disabled style="opacity:0.5">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div id="ob2" class="onboard">
+  <div style="padding-top:50px">
+    <div style="color:var(--mut);font-size:11px;letter-spacing:2px;margin-bottom:8px">STEP 2 OF 4</div>
+    <h2 style="font-size:22px;margin-bottom:6px">When did you stop?</h2>
+    <p style="color:var(--mut);font-size:14px;margin-bottom:24px">Your last smoke date starts your timer.</p>
+    <input type="date" id="inp-date"/>
+    <div style="margin-top:16px">
+      <button class="btn-primary" onclick="showOB(3)">Continue</button>
+    </div>
+    <button class="btn-ghost" onclick="showOB(1)" style="margin-top:8px">Back</button>
+  </div>
+</div>
+
+<div id="ob3" class="onboard">
+  <div style="padding-top:50px">
+    <div style="color:var(--mut);font-size:11px;letter-spacing:2px;margin-bottom:8px">STEP 3 OF 4</div>
+    <h2 style="font-size:22px;margin-bottom:6px">Joints per day?</h2>
+    <p style="color:var(--mut);font-size:14px;margin-bottom:16px">Used to calculate joints avoided.</p>
+    <div style="text-align:center;margin-bottom:16px">
+      <div id="jpd-display" style="font-size:52px;color:var(--green);line-height:1">3</div>
+      <div style="font-size:14px;color:var(--mut)">joints per day</div>
+    </div>
+    <input type="range" min="0.5" max="20" step="0.5" value="3" id="inp-jpd" oninput="updateJPD(this.value)"/>
+    <div style="margin-top:24px">
+      <button class="btn-primary" onclick="showOB(4)">Continue</button>
+    </div>
+    <button class="btn-ghost" onclick="showOB(2)" style="margin-top:8px">Back</button>
+  </div>
+</div>
+
+<div id="ob4" class="onboard">
+  <div style="padding-top:50px">
+    <div style="color:var(--mut);font-size:11px;letter-spacing:2px;margin-bottom:8px">STEP 4 OF 4</div>
+    <h2 style="font-size:22px;margin-bottom:6px">Cost per joint?</h2>
+    <p style="color:var(--mut);font-size:14px;margin-bottom:16px">We'll show how much you're saving.</p>
+    <div style="text-align:center;margin-bottom:16px">
+      <div id="cpj-display" style="font-size:52px;color:var(--amb);line-height:1">$2.00</div>
+      <div style="font-size:14px;color:var(--mut)">per joint</div>
+    </div>
+    <input type="range" min="0.5" max="30" step="0.5" value="2" id="inp-cpj" oninput="updateCPJ(this.value)"/>
+    <div style="margin-top:24px">
+      <button class="btn-primary" onclick="completeOnboarding()">Plant My Seed 🌱</button>
+    </div>
+    <button class="btn-ghost" onclick="showOB(3)" style="margin-top:8px">Back</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+
+<div id="screen-home" class="screen active">
+  <div style="text-align:center;padding-top:12px">
+    <h1 style="color:var(--green);font-size:22px;font-weight:normal;letter-spacing:1px;margin-bottom:2px">Grounded</h1>
+    <p id="home-greeting" style="color:var(--mut);font-size:12px;margin-bottom:4px"></p>
+  </div>
+  <div id="tree-container" style="margin:0 -10px"></div>
+  <div style="text-align:center;margin:-6px 0 12px">
+    <span id="tree-level-badge" class="pill pill-green"></span>
+  </div>
+  <div class="card" style="margin-bottom:10px;text-align:center">
+    <div style="color:var(--mut);font-size:10px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase">Time Clean</div>
+    <div style="display:flex;justify-content:center;gap:6px;align-items:flex-end">
+      <div style="text-align:center"><div id="t-days" style="font-size:34px;font-weight:bold;color:var(--green);line-height:1;min-width:46px">00</div><div style="font-size:10px;color:var(--mut)">days</div></div>
+      <div style="font-size:24px;color:var(--border);padding-bottom:4px">:</div>
+      <div style="text-align:center"><div id="t-hrs" style="font-size:34px;font-weight:bold;color:var(--green);line-height:1;min-width:46px">00</div><div style="font-size:10px;color:var(--mut)">hrs</div></div>
+      <div style="font-size:24px;color:var(--border);padding-bottom:4px">:</div>
+      <div style="text-align:center"><div id="t-min" style="font-size:34px;font-weight:bold;color:var(--green);line-height:1;min-width:46px">00</div><div style="font-size:10px;color:var(--mut)">min</div></div>
+      <div style="font-size:24px;color:var(--border);padding-bottom:4px">:</div>
+      <div style="text-align:center"><div id="t-sec" style="font-size:34px;font-weight:bold;color:var(--green);line-height:1;min-width:46px">00</div><div style="font-size:10px;color:var(--mut)">sec</div></div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-bottom:10px">
+    <div class="stat-card" style="text-align:center">
+      <div style="font-size:28px;color:var(--amb);font-family:Georgia,serif" id="home-streak">0</div>
+      <div style="font-size:11px;color:var(--mut)">day streak 🔥</div>
+    </div>
+    <button id="checkin-btn" onclick="doCheckIn()" style="border-radius:12px;border:none;padding:14px;font-size:14px">Check In Today</button>
+  </div>
+  <div style="background:var(--ambp);border-radius:12px;padding:12px 16px;text-align:center">
+    <p id="home-quote" style="margin:0;color:var(--amb);font-size:13px;font-style:italic;line-height:1.5"></p>
+  </div>
+</div>
+
+<div id="screen-stats" class="screen">
+  <h2>Your Progress</h2>
+  <div class="grid2" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Days Clean</div><div class="stat-val" id="s-days" style="font-size:28px;color:var(--green)">0</div><div style="font-size:11px;color:var(--mut)">days</div></div>
+    <div class="stat-card"><div class="stat-label">Money Saved</div><div class="stat-val" id="s-money" style="font-size:24px;color:var(--amb)">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Joints Avoided</div><div class="stat-val" id="s-joints" style="font-size:28px;color:var(--gl)">0</div><div style="font-size:11px;color:var(--mut)">joints</div></div>
+    <div class="stat-card"><div class="stat-label">Hours Clean</div><div class="stat-val" id="s-hours" style="font-size:26px;color:#5b8c5a">0</div><div style="font-size:11px;color:var(--mut)">hours</div></div>
+  </div>
+  <h3 style="margin-top:0">Future Savings Projection</h3>
+  <div class="card" style="overflow:hidden;padding:0">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-size:14px">Per week</span><span id="proj-week" style="color:var(--amb);font-size:16px;font-family:Georgia,serif"></span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-size:14px">Per month</span><span id="proj-month" style="color:var(--amb);font-size:16px;font-family:Georgia,serif"></span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px"><span style="font-size:14px">Per year</span><span id="proj-year" style="color:var(--amb);font-size:16px;font-family:Georgia,serif"></span></div>
+  </div>
+  <div id="stats-tip" style="background:var(--gp);border-radius:12px;padding:14px 16px;margin-top:12px"><p style="margin:0;color:var(--green);font-size:13px;line-height:1.5"></p></div>
+  <div style="margin-top:16px;text-align:center">
+    <button onclick="resetApp()" style="background:none;border:none;color:var(--mut);font-size:12px;text-decoration:underline;cursor:pointer;font-family:Georgia,serif">Reset / Start Over</button>
+  </div>
+</div>
+
+<div id="screen-health" class="screen">
+  <h2 style="margin-bottom:4px">Health Benefits</h2>
+  <p style="color:var(--mut);font-size:13px;margin-bottom:16px">Your body's healing timeline.</p>
+  <div style="position:relative" id="health-list">
+    <div style="position:absolute;left:18px;top:10px;bottom:10px;width:2px;background:var(--border)"></div>
+  </div>
+</div>
+
+<div id="screen-effects" class="screen">
+  <h2 style="margin-bottom:4px">What to Expect</h2>
+  <p style="color:var(--mut);font-size:13px;margin-bottom:16px">Understanding withdrawal helps you through it.</p>
+  <div id="effects-list"></div>
+</div>
+
+<div id="screen-achievements" class="screen">
+  <h2 style="margin-bottom:12px">Achievements</h2>
+  <div id="medal-display" class="card" style="margin-bottom:16px;text-align:center"></div>
+  <h3 style="margin-top:0">Clean Time Milestones</h3>
+  <div class="grid2" id="time-ach" style="margin-bottom:16px"></div>
+  <h3>Check-in Streaks</h3>
+  <div class="grid2" id="streak-ach"></div>
+</div>
+
+</div><!-- end app -->
+
+<nav class="nav" id="main-nav" style="display:none">
+  <button onclick="showScreen('home')" id="nav-home" class="active"><i class="ti ti-home"></i><span>Home</span></button>
+  <button onclick="showScreen('stats')" id="nav-stats"><i class="ti ti-chart-bar"></i><span>Stats</span></button>
+  <button onclick="showScreen('health')" id="nav-health"><i class="ti ti-heart"></i><span>Health</span></button>
+  <button onclick="showScreen('effects')" id="nav-effects"><i class="ti ti-info-circle"></i><span>Effects</span></button>
+  <button onclick="showScreen('achievements')" id="nav-achievements"><i class="ti ti-trophy"></i><span>Awards</span></button>
+</nav>
+
+<script>
+// ── State ──
+let userData = null;
+let timerInterval = null;
+
+// ── Storage (localStorage for PWA) ──
+function loadData() {
+  try { const v = localStorage.getItem('grounded_v2'); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+}
+function saveData(data) {
+  try { localStorage.setItem('grounded_v2', JSON.stringify(data)); } catch(e){}
+}
+
+// ── Init ──
+(function() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('inp-date').value = today;
+  document.getElementById('inp-date').max = today;
+  userData = loadData();
+  if (userData) showApp();
+})();
+
+// ── Onboarding ──
+function showOB(n) {
+  document.querySelectorAll('.onboard').forEach(el => el.classList.remove('active'));
+  document.getElementById('ob'+n).classList.add('active');
+}
+function checkOB1() {
+  const v = document.getElementById('inp-name').value.trim();
+  const btn = document.getElementById('btn-ob1');
+  btn.disabled = !v; btn.style.opacity = v ? '1' : '0.5';
+}
+function updateJPD(v) { document.getElementById('jpd-display').textContent = v; }
+function updateCPJ(v) { document.getElementById('cpj-display').textContent = '$'+parseFloat(v).toFixed(2); }
+function completeOnboarding() {
+  const name = document.getElementById('inp-name').value.trim() || 'Friend';
+  const dateVal = document.getElementById('inp-date').value;
+  const startDate = new Date(dateVal + 'T00:00:00').toISOString();
+  const jointsPerDay = parseFloat(document.getElementById('inp-jpd').value);
+  const costPerJoint = parseFloat(document.getElementById('inp-cpj').value);
+  userData = { name, startDate, jointsPerDay, costPerJoint, checkIns: [] };
+  saveData(userData);
+  showApp();
+}
+
+// ── Show App ──
+function showApp() {
+  document.querySelectorAll('.onboard').forEach(el => { el.style.display='none'; });
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('main-nav').style.display = 'flex';
+  buildHealthList(); buildEffectsList(); buildAchievements();
+  startTimer(); updateAll();
+}
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateAll, 1000);
+}
+
+// ── Helpers ──
+function getElapsed() { return Math.max(0, Date.now() - new Date(userData.startDate).getTime()); }
+function msToComp(ms) {
+  const s = Math.floor(ms/1000);
+  return { days:Math.floor(s/86400), hours:Math.floor((s%86400)/3600), minutes:Math.floor((s%3600)/60), seconds:s%60, totalHours:Math.floor(s/3600), totalDays:Math.floor(s/86400) };
+}
+function getTreeLevel(days) {
+  if(days<1)return 0;if(days<3)return 1;if(days<7)return 2;if(days<14)return 3;if(days<30)return 4;
+  if(days<60)return 5;if(days<90)return 6;if(days<180)return 7;if(days<365)return 8;return 9;
+}
+function calcStreak(checkIns) {
+  if(!checkIns||!checkIns.length)return 0;
+  const unique=[...new Set(checkIns)].sort().reverse();
+  const today=new Date().toISOString().slice(0,10);
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(unique[0]!==today&&unique[0]!==yesterday)return 0;
+  let streak=1;
+  for(let i=1;i<unique.length;i++){
+    const d1=new Date(unique[i-1]),d2=new Date(unique[i]);
+    if(Math.round((d1-d2)/86400000)===1)streak++;else break;
+  }
+  return streak;
+}
+
+// ── Tree SVG ──
+const LEVEL_NAMES=['Seed','Sprout','Seedling','Sapling','Young Tree','Growing Tree','Mature Tree','Full Tree','Ancient Tree','Legendary Oak'];
+const TRUNK_H=[0,28,48,68,88,102,118,130,142,150];
+const TRUNK_W=[0,7,9,11,13,15,17,19,21,24];
+
+function buildTreeSVG(level) {
+  const cx=150,groundY=218;
+  const tH=TRUNK_H[level],tW=TRUNK_W[level],tTop=groundY-tH;
+  const cls=[[],[{cx,cy:groundY-34,r:18,c:'#5ba052'}],[{cx,cy:groundY-58,r:24,c:'#4a8a42'},{cx:cx-20,cy:groundY-44,r:15,c:'#2d5a27'},{cx:cx+20,cy:groundY-44,r:15,c:'#2d5a27'}],[{cx,cy:groundY-78,r:30,c:'#4a8a42'},{cx:cx-28,cy:groundY-62,r:20,c:'#2d5a27'},{cx:cx+28,cy:groundY-62,r:20,c:'#2d5a27'},{cx,cy:groundY-56,r:16,c:'#3d7535'}],[{cx,cy:groundY-98,r:35,c:'#4a8a42'},{cx:cx-34,cy:groundY-79,r:23,c:'#2d5a27'},{cx:cx+34,cy:groundY-79,r:23,c:'#2d5a27'},{cx:cx-17,cy:groundY-64,r:18,c:'#3d7535'},{cx:cx+17,cy:groundY-64,r:18,c:'#3d7535'}],[{cx,cy:groundY-112,r:39,c:'#4a8a42'},{cx:cx-41,cy:groundY-90,r:27,c:'#2d5a27'},{cx:cx+41,cy:groundY-90,r:27,c:'#2d5a27'},{cx:cx-20,cy:groundY-73,r:21,c:'#3d7535'},{cx:cx+20,cy:groundY-73,r:21,c:'#3d7535'},{cx,cy:groundY-79,r:20,c:'#5ba052'}],[{cx,cy:groundY-124,r:43,c:'#4a8a42'},{cx:cx-47,cy:groundY-102,r:31,c:'#2d5a27'},{cx:cx+47,cy:groundY-102,r:31,c:'#2d5a27'},{cx:cx-22,cy:groundY-82,r:23,c:'#3d7535'},{cx:cx+22,cy:groundY-82,r:23,c:'#3d7535'},{cx,cy:groundY-88,r:23,c:'#5ba052'},{cx:cx-57,cy:groundY-85,r:16,c:'#3d7535'},{cx:cx+57,cy:groundY-85,r:16,c:'#3d7535'}],[{cx,cy:groundY-134,r:47,c:'#4a8a42'},{cx:cx-51,cy:groundY-111,r:35,c:'#2d5a27'},{cx:cx+51,cy:groundY-111,r:35,c:'#2d5a27'},{cx:cx-25,cy:groundY-90,r:26,c:'#3d7535'},{cx:cx+25,cy:groundY-90,r:26,c:'#3d7535'},{cx,cy:groundY-96,r:27,c:'#5ba052'},{cx:cx-62,cy:groundY-93,r:19,c:'#3d7535'},{cx:cx+62,cy:groundY-93,r:19,c:'#3d7535'}],[{cx,cy:groundY-142,r:50,c:'#4a8a42'},{cx:cx-54,cy:groundY-119,r:38,c:'#2d5a27'},{cx:cx+54,cy:groundY-119,r:38,c:'#2d5a27'},{cx:cx-27,cy:groundY-97,r:29,c:'#3d7535'},{cx:cx+27,cy:groundY-97,r:29,c:'#3d7535'},{cx,cy:groundY-104,r:31,c:'#5ba052'},{cx:cx-65,cy:groundY-100,r:23,c:'#3d7535'},{cx:cx+65,cy:groundY-100,r:23,c:'#3d7535'},{cx:cx-40,cy:groundY-78,r:17,c:'#2d5a27'},{cx:cx+40,cy:groundY-78,r:17,c:'#2d5a27'}],[{cx,cy:groundY-148,r:53,c:'#4a8a42'},{cx:cx-57,cy:groundY-124,r:41,c:'#2d5a27'},{cx:cx+57,cy:groundY-124,r:41,c:'#2d5a27'},{cx:cx-29,cy:groundY-101,r:32,c:'#3d7535'},{cx:cx+29,cy:groundY-101,r:32,c:'#3d7535'},{cx,cy:groundY-108,r:34,c:'#5ba052'},{cx:cx-68,cy:groundY-104,r:26,c:'#3d7535'},{cx:cx+68,cy:groundY-104,r:26,c:'#3d7535'},{cx:cx-43,cy:groundY-81,r:20,c:'#2d5a27'},{cx:cx+43,cy:groundY-81,r:20,c:'#2d5a27'},{cx,cy:groundY-74,r:16,c:'#4a8a42'}]];
+  const clusters=cls[level]||[];
+  let roots='';
+  if(level>=3)roots+=`<path d="M${cx-tW/2+1} ${groundY-2} Q${cx-22} ${groundY+4} ${cx-38} ${groundY+2}" fill="none" stroke="#6B4423" stroke-width="${Math.max(2,tW*0.35)}" stroke-linecap="round"/><path d="M${cx+tW/2-1} ${groundY-2} Q${cx+22} ${groundY+4} ${cx+38} ${groundY+2}" fill="none" stroke="#6B4423" stroke-width="${Math.max(2,tW*0.35)}" stroke-linecap="round"/>`;
+  if(level>=5)roots+=`<path d="M${cx-tW/2} ${groundY-4} Q${cx-40} ${groundY+2} ${cx-55} ${groundY}" fill="none" stroke="#6B4423" stroke-width="${Math.max(2,tW*0.25)}" stroke-linecap="round"/><path d="M${cx+tW/2} ${groundY-4} Q${cx+40} ${groundY+2} ${cx+55} ${groundY}" fill="none" stroke="#6B4423" stroke-width="${Math.max(2,tW*0.25)}" stroke-linecap="round"/>`;
+  const flowers=level>=7?`<circle cx="${cx-22}" cy="${tTop-70}" r="5" fill="#f9c74f"/><circle cx="${cx+35}" cy="${tTop-85}" r="4" fill="#f9c74f"/><circle cx="${cx-8}" cy="${tTop-96}" r="4" fill="#fff8e1"/>`:'' ;
+  const fruits=level>=8?`<circle cx="${cx-36}" cy="${tTop-50}" r="7" fill="#e05b5b"/><circle cx="${cx+42}" cy="${tTop-60}" r="7" fill="#e05b5b"/><circle cx="${cx+6}" cy="${tTop-66}" r="6" fill="#e05b5b"/>`:'' ;
+  const glow=level===9?`<circle cx="${cx}" cy="${tTop-50}" r="65" fill="#f9c74f" opacity="0.06"/>`:'' ;
+  const seed=level===0?`<ellipse cx="${cx}" cy="${groundY}" rx="10" ry="6" fill="#8B6914"/><text x="${cx}" y="${groundY+22}" text-anchor="middle" style="font-size:11px;fill:#7a6a55;font-family:Georgia,serif">Your journey begins...</text>`:'' ;
+  const trunk=level>=1?`<rect x="${cx-tW/2}" y="${tTop}" width="${tW}" height="${tH}" rx="${Math.max(2,tW/4)}" fill="#6B4423"/>`:'' ;
+  const leafHTML=clusters.map(c=>`<circle cx="${c.cx}" cy="${c.cy}" r="${c.r}" fill="${c.c}"/>`).join('');
+  return `<svg viewBox="0 0 300 250" width="100%" style="display:block"><ellipse cx="${cx}" cy="${groundY+6}" rx="78" ry="9" fill="#b8956a" opacity="0.35"/>${seed}${roots}${trunk}${leafHTML}${flowers}${fruits}${glow}</svg>`;
+}
+
+// ── Update All ──
+function updateAll() {
+  if(!userData)return;
+  const elapsed=getElapsed();
+  const {days,hours,minutes,seconds,totalHours}=msToComp(elapsed);
+  const level=getTreeLevel(days);
+  const streak=calcStreak(userData.checkIns||[]);
+  const jointsAvoided=(elapsed/86400000)*userData.jointsPerDay;
+  const moneySaved=jointsAvoided*userData.costPerJoint;
+  const today=new Date().toISOString().slice(0,10);
+  const checkedIn=(userData.checkIns||[]).includes(today);
+
+  document.getElementById('t-days').textContent=String(days).padStart(2,'0');
+  document.getElementById('t-hrs').textContent=String(hours).padStart(2,'0');
+  document.getElementById('t-min').textContent=String(minutes).padStart(2,'0');
+  document.getElementById('t-sec').textContent=String(seconds).padStart(2,'0');
+  document.getElementById('home-streak').textContent=streak;
+  document.getElementById('home-greeting').textContent='Welcome back, '+userData.name;
+  document.getElementById('tree-level-badge').textContent=LEVEL_NAMES[level];
+  document.getElementById('tree-container').innerHTML=buildTreeSVG(level);
+
+  const btn=document.getElementById('checkin-btn');
+  if(checkedIn){btn.style.background='var(--gp)';btn.style.color='var(--green)';btn.textContent='✓ Checked In';}
+  else{btn.style.background='var(--green)';btn.style.color='#fff';btn.textContent='Check In Today';}
+
+  const quotes=['Every moment is a victory.','The hardest part is behind you. Keep going.','You\'re building real momentum now.','Your mind is clearing. You\'re doing it.','You are an inspiration. Rooted and thriving.'];
+  document.getElementById('home-quote').textContent=quotes[days<1?0:days<7?1:days<30?2:days<90?3:4];
+
+  document.getElementById('s-days').textContent=days;
+  document.getElementById('s-money').textContent='$'+moneySaved.toFixed(2);
+  document.getElementById('s-joints').textContent=Math.round(jointsAvoided);
+  document.getElementById('s-hours').textContent=totalHours;
+  const wk=userData.jointsPerDay*7*userData.costPerJoint;
+  const mo=userData.jointsPerDay*30*userData.costPerJoint;
+  document.getElementById('proj-week').textContent='$'+wk.toFixed(2);
+  document.getElementById('proj-month').textContent='$'+mo.toFixed(2);
+  document.getElementById('proj-year').textContent='$'+(mo*12).toFixed(2);
+  document.querySelector('#stats-tip p').textContent='At '+userData.jointsPerDay+' joints/day at $'+userData.costPerJoint.toFixed(2)+' each, you save $'+(userData.jointsPerDay*userData.costPerJoint).toFixed(2)+' every single day.';
+
+  updateHealthList(totalHours);
+  updateEffectsList(days);
+  updateAchievements(days,streak,level);
+}
+
+// ── Health ──
+const HEALTH_MILESTONES=[
+  {h:1,title:'Heart settling',desc:'Heart rate begins to normalize as your body adjusts.'},
+  {h:12,title:'Oxygen rising',desc:'Carbon monoxide and toxin levels in your blood are dropping.'},
+  {h:24,title:'Day one complete',desc:'Your body has begun flushing THC metabolites. Anxiety may peak — it\'s temporary.'},
+  {h:48,title:'System flushing',desc:'Stored THC is actively clearing. Appetite and sleep begin to shift.'},
+  {h:72,title:'THC dropping',desc:'Blood THC levels have fallen significantly. Your brain is adapting.'},
+  {h:168,title:'One week strong',desc:'Sleep quality improving. Lungs clearing — you may notice easier breathing.'},
+  {h:336,title:'Two weeks clear',desc:'Appetite normalizing. Mood stability beginning to return.'},
+  {h:720,title:'One month milestone',desc:'Memory and focus noticeably sharper. Lung function measurably improved.'},
+  {h:1440,title:'Two months in',desc:'Emotional regulation improving. Most people feel substantially better mentally.'},
+  {h:2160,title:'Three months',desc:'Cognitive function, memory, and attention all measurably improved.'},
+  {h:4320,title:'Six months',desc:'Emotional resilience significantly stronger. Brain chemistry approaching baseline.'},
+  {h:8760,title:'One full year',desc:'Cognitive function largely restored. Your brain has healed. You are thriving.'},
+];
+
+function buildHealthList() {
+  const c=document.getElementById('health-list');
+  c.innerHTML='<div style="position:absolute;left:18px;top:10px;bottom:10px;width:2px;background:var(--border)"></div>';
+  HEALTH_MILESTONES.forEach((m,i)=>{
+    const div=document.createElement('div');div.id='hm-'+i;div.style.cssText='display:flex;gap:14px;margin-bottom:14px;position:relative';
+    div.innerHTML=`<div style="width:36px;flex-shrink:0;display:flex;justify-content:center"><div id="hdot-${i}" class="timeline-dot" style="background:var(--border);border:2px solid var(--border)"></div></div><div id="hcard-${i}" style="flex:1;border-radius:10px;border:1px solid var(--border);padding:10px 14px;background:var(--card);opacity:0.5"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><span style="font-size:14px;color:var(--txt)">${m.title}</span><span id="hbadge-${i}" style="font-size:11px;color:var(--mut)"></span></div><p style="margin:0;font-size:12px;color:var(--mut);line-height:1.5">${m.desc}</p></div>`;
+    c.appendChild(div);
+  });
+}
+function updateHealthList(hoursClean) {
+  HEALTH_MILESTONES.forEach((m,i)=>{
+    const achieved=hoursClean>=m.h,isNext=!achieved&&(i===0||hoursClean>=HEALTH_MILESTONES[i-1].h);
+    const dot=document.getElementById('hdot-'+i),card=document.getElementById('hcard-'+i),badge=document.getElementById('hbadge-'+i);
+    if(!dot)return;
+    if(achieved){dot.style.background='var(--green)';dot.style.borderColor='var(--green)';card.style.background='var(--gp)';card.style.borderColor='#4a8a4240';card.style.opacity='1';badge.textContent='✓ Achieved';badge.style.color='var(--green)';card.querySelector('span').style.color='var(--green)';}
+    else if(isNext){dot.style.background='var(--amb)';dot.style.borderColor='var(--amb)';card.style.background='var(--ambp)';card.style.borderColor='#c17d3c40';card.style.opacity='1';badge.textContent='Up next';badge.style.color='var(--amb)';}
+    else{dot.style.background='var(--border)';dot.style.borderColor='var(--border)';card.style.background='var(--card)';card.style.borderColor='var(--border)';card.style.opacity='0.45';badge.textContent='';}
+  });
+}
+
+// ── Effects ──
+const PHASES=[
+  {phase:'Phase 1',title:'The First Wave',days:'Days 1–3',startDay:0,endDay:3,color:'#c0392b',bg:'#fdecea',symptoms:['Strong urges and cravings','Irritability and mood swings','Difficulty falling asleep','Reduced appetite','Anxiety and restlessness'],tip:'Stay hydrated. Take walks. Cravings typically peak at 72 hours then fade.'},
+  {phase:'Phase 2',title:'Vivid Dreams',days:'Days 4–7',startDay:3,endDay:7,color:'#e67e22',bg:'#fef5ec',symptoms:['Very vivid or strange dreams','Continued sleep disruption','Mood swings persist','Possible headaches','Night sweats possible'],tip:"Those strange dreams are your REM sleep returning. It's actually a healthy sign."},
+  {phase:'Phase 3',title:'The Fog',days:'Days 8–14',startDay:7,endDay:14,color:'#6b7280',bg:'#f4f6f7',symptoms:['Brain fog and poor focus','Low motivation','Depression may emerge','Cravings may briefly intensify','Sleep slowly improving'],tip:'Often the hardest stretch. It does get better — exercise helps enormously.'},
+  {phase:'Phase 4',title:'Clearing',days:'Days 15–30',startDay:14,endDay:30,color:'#c17d3c',bg:'#fdf6ec',symptoms:['Physical symptoms fading','Energy levels improving','Clearer thinking emerging','Cravings becoming manageable','Sleep quality improving'],tip:"You're over the hardest part. Notice the small wins — they add up fast."},
+  {phase:'Phase 5',title:'Recovery',days:'1 month+',startDay:30,endDay:Infinity,color:'#2d5a27',bg:'#d8ead5',symptoms:['Most withdrawal complete','Brain chemistry rebalancing','Memory and focus improving','Emotional regulation returning','New healthy baseline emerging'],tip:"You've done the hard work. Your brain is healing. Keep going."},
+];
+function buildEffectsList() {
+  const c=document.getElementById('effects-list');c.innerHTML='';
+  PHASES.forEach((ph,i)=>{
+    const div=document.createElement('div');div.id='ph-'+i;div.className='phase-card';
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:11px;letter-spacing:1px;margin-bottom:2px;color:${ph.color}">${ph.phase} · ${ph.days}</div><div style="font-size:15px;color:var(--txt)">${ph.title}</div></div><div id="ph-badge-${i}" style="padding:3px 10px;border-radius:20px;font-size:11px;border:1px solid var(--border);color:var(--mut)">Upcoming</div></div><ul style="margin:0 0 10px;padding-left:18px">${ph.symptoms.map(s=>`<li style="font-size:12px;color:var(--mut);line-height:1.7">${s}</li>`).join('')}</ul><div id="ph-tip-${i}" style="display:none;background:#fff;border-radius:8px;padding:8px 12px;border-left:3px solid ${ph.color}"><p style="margin:0;font-size:12px;color:var(--txt);font-style:italic">${ph.tip}</p></div>`;
+    c.appendChild(div);
+  });
+}
+function updateEffectsList(daysClean) {
+  PHASES.forEach((ph,i)=>{
+    const isCurrent=daysClean>=ph.startDay&&daysClean<ph.endDay,isPast=daysClean>=ph.endDay;
+    const card=document.getElementById('ph-'+i),badge=document.getElementById('ph-badge-'+i),tip=document.getElementById('ph-tip-'+i);
+    if(!card)return;
+    card.style.background=isCurrent?ph.bg:'var(--card)';card.style.borderColor=isCurrent?ph.color+'60':'var(--border)';card.style.opacity=isPast?'0.55':'1';
+    if(isCurrent){badge.style.background=ph.color;badge.style.color='#fff';badge.style.border='none';badge.textContent='You are here';}
+    else if(isPast){badge.style.background='var(--gp)';badge.style.color='var(--green)';badge.style.borderColor='transparent';badge.textContent='Completed';}
+    else{badge.style.background='transparent';badge.style.color='var(--mut)';badge.style.borderColor='var(--border)';badge.textContent='Upcoming';}
+    tip.style.display=(isCurrent||isPast)?'block':'none';
+  });
+}
+
+// ── Achievements ──
+const TIME_ACH=[{id:'d1',title:'First Step',desc:'1 day clean',days:1,icon:'🌱'},{id:'d3',title:'Three Days',desc:'3 days clean',days:3,icon:'🌿'},{id:'w1',title:'One Week',desc:'7 days clean',days:7,icon:'⭐'},{id:'w2',title:'Two Weeks',desc:'14 days clean',days:14,icon:'🌟'},{id:'m1',title:'One Month',desc:'30 days clean',days:30,icon:'🏅'},{id:'m3',title:'Three Months',desc:'90 days clean',days:90,icon:'🏆'},{id:'m6',title:'Six Months',desc:'180 days clean',days:180,icon:'🥇'},{id:'y1',title:'One Year',desc:'365 days clean',days:365,icon:'👑'}];
+const STREAK_ACH=[{id:'s3',title:'Daily Visitor',desc:'3-day streak',streak:3,icon:'✅'},{id:'s7',title:'Consistent',desc:'7-day streak',streak:7,icon:'📅'},{id:'s14',title:'Committed',desc:'14-day streak',streak:14,icon:'💪'},{id:'s30',title:'Dedicated',desc:'30-day streak',streak:30,icon:'🔥'}];
+const MEDALS=[{title:'Seed',days:0,streak:0,color:'#8B6914',icon:'🫘',desc:'Just getting started'},{title:'Bronze Sprout',days:7,streak:3,color:'#a05c2a',icon:'🌱',desc:'Your first week'},{title:'Silver Sapling',days:30,streak:7,color:'#8a8a8a',icon:'🌿',desc:'A month of freedom'},{title:'Gold Tree',days:90,streak:14,color:'#c9960c',icon:'🌳',desc:'Three months strong'},{title:'Platinum Oak',days:365,streak:30,color:'#5c9bd6',icon:'🌲',desc:'A full year rooted'}];
+
+function buildAchievements() {
+  const ta=document.getElementById('time-ach');
+  TIME_ACH.forEach(a=>{const d=document.createElement('div');d.id='ach-'+a.id;d.className='ach-card';d.innerHTML=`<div style="font-size:26px;margin-bottom:4px">${a.icon}</div><div style="font-size:13px;color:var(--txt)">${a.title}</div><div style="font-size:11px;color:var(--mut)">${a.desc}</div>`;ta.appendChild(d);});
+  const sa=document.getElementById('streak-ach');
+  STREAK_ACH.forEach(a=>{const d=document.createElement('div');d.id='ach-'+a.id;d.className='ach-card';d.innerHTML=`<div style="font-size:26px;margin-bottom:4px">${a.icon}</div><div style="font-size:13px;color:var(--txt)">${a.title}</div><div style="font-size:11px;color:var(--mut)">${a.desc}</div>`;sa.appendChild(d);});
+}
+function updateAchievements(daysClean,streak,level) {
+  TIME_ACH.forEach(a=>{const el=document.getElementById('ach-'+a.id);if(!el)return;const e=daysClean>=a.days;el.classList.toggle('earned',e);el.style.opacity=e?'1':'0.4';el.querySelector('div:nth-child(2)').style.color=e?'var(--green)':'var(--txt)';});
+  STREAK_ACH.forEach(a=>{const el=document.getElementById('ach-'+a.id);if(!el)return;const e=streak>=a.streak;el.classList.remove('earned');el.classList.toggle('streak-earned',e);el.style.opacity=e?'1':'0.4';el.querySelector('div:nth-child(2)').style.color=e?'var(--amb)':'var(--txt)';});
+  let mi=0;for(let i=MEDALS.length-1;i>=0;i--){if(daysClean>=MEDALS[i].days&&streak>=MEDALS[i].streak){mi=i;break;}}
+  const m=MEDALS[mi],next=MEDALS[mi+1];
+  document.getElementById('medal-display').innerHTML=`<div style="font-size:44px;margin-bottom:6px">${m.icon}</div><div style="font-size:18px;color:${m.color};font-family:Georgia,serif;margin-bottom:3px">${m.title}</div><div style="font-size:13px;color:var(--mut)">${m.desc}</div>${next?`<div style="margin-top:10px;font-size:12px;color:var(--mut)">Next: <span style="color:${next.color}">${next.title}</span> — ${Math.max(0,next.days-daysClean)} more days + ${Math.max(0,next.streak-streak)}-day streak</div>`:''}`;
+}
+
+// ── Navigation ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  updateAll();
+}
+
+// ── Check In ──
+function doCheckIn() {
+  if(!userData)return;
+  const today=new Date().toISOString().slice(0,10);
+  const checkIns=userData.checkIns||[];
+  if(!checkIns.includes(today)){userData={...userData,checkIns:[...checkIns,today]};saveData(userData);updateAll();}
+}
+
+// ── Reset ──
+function resetApp() {
+  if(!confirm('Start over? This will erase all your progress.'))return;
+  localStorage.removeItem('grounded_v2');
+  userData=null;clearInterval(timerInterval);
+  document.getElementById('app').style.display='none';document.getElementById('main-nav').style.display='none';
+  document.querySelectorAll('.onboard').forEach(el=>{el.style.display='';el.classList.remove('active');});
+  document.getElementById('ob0').classList.add('active');
+}
+
+// ── Service Worker ──
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered');
+    }).catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>
